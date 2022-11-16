@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QStandardItemModel, QFont
 import traceback
+import numpy as np
 
 import matplotlib
 import matplotlib.font_manager as fm
@@ -40,7 +41,13 @@ class exceler:
 
     def image_generate(self, data):
         plt.figure(figsize=(5.4, 5.8))
-        plt.plot(data, label='신고자 수')
+        for i in range(len(data)):
+            if data[i] != 0:
+                zero_del = i+1
+        zero_del = np.array([True if j<zero_del else False for j in [i for i in range(len(data))]
+                             ])
+        
+        plt.plot(data, zero_del, color='white', linewidth=2.2, label='신고자 수')
         plt.ylabel('(명)')
         plt.xlabel('주(week)')
         plt.legend()
@@ -311,7 +318,15 @@ class MyApp(QWidget):
             
             self.gened.data+=[0 for i in range(int(self.slider1.value()-self.gened.length))]
             self.gened.imagename = '통합 그래프 '+str(self.data[0][0])+'~'+str(self.data[-1][0])
-            self.model1.plot(data=self.gened.data, title=self.gened.imagename)
+            for i in range(len(self.gened.data)):
+                if self.gened.data[i] != 0:
+                    zero_del = i+1
+            zero_del = np.array([True if j<zero_del else False for j in [i for i in range(len(self.gened.data))]
+                             ])
+        
+            self.model1.plot(self.gened.data, zero_del, color='white', linewidth=2.2, label='신고자 수')
+
+            #self.model1.plot(data=self.gened.data, title=self.gened.imagename)
         except Exception as e:
             print(e)
     
@@ -347,3 +362,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MyApp()
     sys.exit(app.exec_())
+
